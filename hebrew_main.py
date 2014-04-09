@@ -10,9 +10,8 @@ from Word import Word
 
 # WHAT IF THEY TYPE THE WRONG THING - TELL THEM WHICH WASNT RECOGNIZED
 # FINAL LETTERS - IF THERE ARE TWO OPTIONS AND ITS THE END, TAKE THE SECOND
-# MATCHING GAME WITH LETTERS OR DICTIONARY
-# EDIT OR DELETE A WORD FROM THE DICTIONARY
-
+# EDIT OR DELETE A WORD FROM THE DICTIONARY??
+# add rest of letters!!!!!!
 a = "\u05D0"
 b = "\u05D1\u05BC"
 d = "\u05D3"
@@ -59,7 +58,10 @@ def save(e,h,s,t):
         ma = False
         si = False
     w = Word(e,h,m,s,t)
-    dictionary[e] = w
+    if (e in dictionary):
+        dictionary[e] = dictionary[e].append(w)
+    else:
+        dictionary[e] = [w]
     f.close()
 
 def t2h(word):
@@ -67,7 +69,11 @@ def t2h(word):
     final = ""
     for sils in word_array:
         sound = sils.split("|")
-        final = final + letter[sound[0]] + vowel[sound[1]]
+        if (sound[0] in letter and sound[1] in vowel):
+            final = final + letter[sound[0]] + vowel[sound[1]]
+        else:
+            print("That was not a valid transliteration for Hebrew")
+            return False
     return final
     
 def dictionaries():
@@ -90,7 +96,10 @@ def dictionaries():
             m = False
             s = False
         w = Word(p0,p1,m,s,p3)
-        dictionary[p0] = w
+        if (p0 in dictionary):
+            dictionary[p0] = dictionary[p0][len(dictionary[p0]):] = [w]
+        else:
+            dictionary[p0] = [w]
 
 def specString(a,b):
     m = "Masculine"
@@ -102,60 +111,81 @@ def specString(a,b):
     return (m + " and " + s)
 
 def printE():
-    for word in sorted(dictionary):
-        w = dictionary[word]
-        s = specString(w.male,w.single)
-        print(word + " (" + s + ") = " + t2h(w.wordH))
+    for word_key in sorted(dictionary):
+        for word in dictionary[word_key]:
+            s = specString(word.male,word.single)
+            print(word.wordE + " (" + s + ") = " + t2h(word.wordH))
 
 def makeSentences(arr):
-    noun = []
-    adj = []
-    verb = []
+    MS = {"N":[],"V":[],"A":[]}
+    MP = {"N":[],"V":[],"A":[]}
+    FS = {"N":[],"V":[],"A":[]}
+    FP = {"N":[],"V":[],"A":[]}
     for word in arr:
-        if (word.wordType == "N"):
-            noun.append(word)
-        elif (word.wordType == "V"):
-            verb.append(word)
-        elif (word.wordType == "A"):
-            adj.append(word)
-    if (len(noun) == 0):
-        print("You need at least one noun for a good sentence!\n")
-    else:
-        print(t2h(noun[0].wordH) + t2h(noun[1].wordH))
-    ## WHAT WILL I DO ABOUT THE FACT THAT THERE MAY BE "BIG" 4 TIMES - HOW WILL IT HOLD ALL 4
+        print(word.wordType)
+        if (word.male and word.single):
+            MS[word.wordType].append(word)
+        elif (word.male and not word.single):
+            MP[word.wordType].append(word)
+        elif (not word.male and word.single):
+            FS[word.wordType].append(word)
+        elif (not word.male and not word.single):
+            FP[word.wordType].append(word)
+    print("ms has " + str(FS['N']))
+    printSent(MS)
+    printSent(MP)
+    printSent(FS)
+    printSent(FP)
+
+
+### WHEN DICTIONARY PRINTS IT PRINTS THE SAME OF THE TWO TALK NOT BOTH
+
+def printSent(d):
+    for noun in d['N']:
+        for adj in d['A']:
+            for verb in d['V']:
+                print("The " + noun.wordE + " " + adj.wordE + " " + verb.wordE)
+                print(t2h(addThe(noun.wordH)) + " " + t2h(adj.wordH) + " " + t2h(verb.wordH))
+
 def addThe(word):
     result = "H|a " + word.wordH
     return result
 
 def main():
     command = input(direction)
-    while (command != "EXIT"):
-        if (command.startswith("CREATE")):
+    while (command.upper() != "EXIT"):
+        if (command.upper().startswith("CREATE")):
             word = command[7:]
             while (word == ""):
                 word = input("What is the word?")
             final = t2h(word)
-            ## what about if someone types in something that isn't hebrewwwww
+            if (final == False):
+                main()
+                break
             print(final + "\n")
             print("Would you like to save this word?\n")
             maybe = input("Type 'NO' or 'AS' followed by the English definition\n")
-            while (maybe != "NO" and not maybe.startswith("AS")):
+            while (maybe.upper() != "NO" and not maybe.upper().startswith("AS")):
                 maybe = input("Type 'NO' or 'AS' followed by the English definition\n")
-            if (maybe.startswith('AS')):
+            if (maybe.upper().startswith('AS')):
+		# what if they include spaces???
                 eng = maybe[3:]
+                while(len(eng.split(" ")) > 1):
+                    print("English definitions must be a single word, no spaces.")
+                    eng = input("Retype the English word\n")
                 m = input("Type M for a masculine word, or F for a feminine word\n")
-                while (m != "M" and m != "F"):
+                while (m.upper() != "M" and m.upper() != "F"):
                     m = input("Type M for a masculine word, or F for a feminine word\n")
                 s = input("Type S for a singular word, or P for a plural word\n")
-                while (s != "S" and s != "P"):
+                while (s.upper() != "S" and s.upper() != "P"):
                     s = input("Type S for a singular word, or P for a plural word\n")
                 t = input("Type N for a noun, V for a verb, or A for an adjective\n")
-                while (t != "N" and t != "V" and t != "A"):
+                while (t.upper() != "N" and t.upper() != "V" and t.upper() != "A"):
                     t = input("Type N for a noun, V for a verb, or A for an adjective\n")    
-                specs = m + s;
-                save(eng,word,specs,t)
+                specs = m.upper() + s.upper();
+                save(eng,word,specs,t.upper())
                 print(final + " has been saved as " + eng + "\n")
-        elif (command == "CODES"):
+        elif (command.upper() == "CODES"):
             print("LETTERS\n")
             for let in sorted(letter):
                 print("Type " + let + " for " + letter[let] + ",   ")
@@ -163,16 +193,17 @@ def main():
             for vow in sorted(vowel):
                 print("Type " + vow + " for  " + vowel[vow] + ",   ")
             print("\n")
-        elif (command == "DICTIONARY"):
+        elif (command.upper() == "DICTIONARY"):
             printE()
-        elif (command.startswith("TRANSLATE")):
+        elif (command.upper().startswith("TRANSLATE")):
             english = command[10:]
             engs = english.split(" ")
             word_array = []
             for w in engs:
                 w = w.upper()
                 if (w in dictionary):
-                    word_array.append(dictionary[w])
+                    for wo in dictionary[w]:
+                        word_array.append(wo)
                 else:
                     print("The word " + w + " does not exist in the dictionary.\n")
                     print("The computer will still try to make a sentence\n")
