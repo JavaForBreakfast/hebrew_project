@@ -1,3 +1,5 @@
 BANANA:B|a N|ah N|a H|:MS:N
 APPLE:B|a B|ah B|a:MS:N
 APPLES:H|a H|a:MP:N
+TALK:H|a N|a:MS:V
+TALK:H|a N|a N|:FS:V
