@@ -23,26 +23,24 @@ z = "\u05D6"
 ch = "\u05D7"
 te = "\u05D8"
 y = "\u05D9"
-c = "\u05D9"
-cha = "\u05D9"
-l = "\u05D9"
-m = "\u05D9"
+c = "\u05DB\u05BC"
+cha = "\u05DB"
+l = "\u05DC"
+m = "\u05DE"
 n = "\u05E0"
-s = "\u05D9"
-ay = "\u05D9"
-p = "\u05D9"
-f = "\u05D9"
-tz = "\u05D9"
-k = "\u05D9"
-r = "\u05D9"
-sh = "\u05D9"
-si = "\u05D9"
-t = "\u05D9"
-letter = {"A":a,"B":b,"H":h,"G":g,"N":n,"V":v, "D":d,"VA":va}
-order = ["A","B","V","G","D","H","VA","Z","CH","TE","Y","C","CHA","L","M","N","S","AY","P","F","TZ","K","R","SH","SI","T"]
-names = {"Alef":a,"Bet":b,"Vet":v,"Gimel":g,"Dalet":d}
-vowel = {"a":"\u05B7","ah":"\u05C7","":"",".":"\u05B0","oh":"\u05B9"}
-direction = "Type 'CREATE' followed by a Hebrew word, 'CODES' for the codes, 'DICTIONARY' for the words, 'TRANSLATE' followed by English words for sentence options, or 'EXIT' to finish\n"
+s = "\u05E1"
+ay = "\u05E2"
+p = "\u05E4\u05BC"
+f = "\u05E4"
+tz = "\u05E6"
+k = "\u05E7"
+r = "\u05E8"
+sh = "\u05E9\u05C1"
+si = "\u05E9\u05B9"
+t = "\u05EA"
+letter = {"A":a,"B":b,"V":v,"G":g,"D":d,"H":h,"Va":va,"Z":z,"Ch":ch,"Te":te,"Y":y,"C":c,"Cha":cha,"L":l,"M":m,"N":n,"S":s,"Ay":ay,"P":p,"F":f,"Tz":tz,"K":k,"R":r,"Sh":sh,"Si":si,"T":t}
+vowel = {"a":"\u05B7","ah":"\u05C7","":"",".":"\u05B0","oh":"\u05B9","e":"\u05B6","eh":"\u05B1","i":"\u05B4", "ay":"\u05B5", "ooh":"\u05BB","oo":"\u05BC"}
+direction = "Type 'CREATE' followed by a Hebrew word, \n'CODES' for the codes, \n'DICTIONARY' for the words, \n'TRANSLATE' followed by English words for sentence options, \nor 'EXIT' to finish\n"
 dictionary = {}
 def save(e,h,s,t):
     e = e.upper()
@@ -69,7 +67,9 @@ def t2h(word):
     final = ""
     for sils in word_array:
         sound = sils.split("|")
-        if (sound[0] in letter and sound[1] in vowel):
+        if (sils == ""):
+            return ""
+        elif (sound[0] in letter and sound[1] in vowel):
             final = final + letter[sound[0]] + vowel[sound[1]]
         else:
             print("That was not a valid transliteration for Hebrew")
@@ -97,7 +97,7 @@ def dictionaries():
             s = False
         w = Word(p0,p1,m,s,p3)
         if (p0 in dictionary):
-            dictionary[p0] = dictionary[p0][len(dictionary[p0]):] = [w]
+            dictionary[p0][len(dictionary[p0]):] = [w]
         else:
             dictionary[p0] = [w]
 
@@ -117,12 +117,12 @@ def printE():
             print(word.wordE + " (" + s + ") = " + t2h(word.wordH))
 
 def makeSentences(arr):
-    MS = {"N":[],"V":[],"A":[]}
-    MP = {"N":[],"V":[],"A":[]}
-    FS = {"N":[],"V":[],"A":[]}
-    FP = {"N":[],"V":[],"A":[]}
+    blank = Word("","",True,True,"A")
+    MS = {"N":list(),"V":list(),"A":[blank]}
+    MP = {"N":list(),"V":list(),"A":[blank]}
+    FS = {"N":list(),"V":list(),"A":[blank]}
+    FP = {"N":list(),"V":list(),"A":[blank]}
     for word in arr:
-        print(word.wordType)
         if (word.male and word.single):
             MS[word.wordType].append(word)
         elif (word.male and not word.single):
@@ -131,7 +131,6 @@ def makeSentences(arr):
             FS[word.wordType].append(word)
         elif (not word.male and not word.single):
             FP[word.wordType].append(word)
-    print("ms has " + str(FS['N']))
     printSent(MS)
     printSent(MP)
     printSent(FS)
@@ -144,11 +143,11 @@ def printSent(d):
     for noun in d['N']:
         for adj in d['A']:
             for verb in d['V']:
-                print("The " + noun.wordE + " " + adj.wordE + " " + verb.wordE)
-                print(t2h(addThe(noun.wordH)) + " " + t2h(adj.wordH) + " " + t2h(verb.wordH))
+                print("THE " + adj.wordE + " " + noun.wordE + " " + verb.wordE)
+                print(t2h(addThe(noun.wordH)) + " " + t2h(adj.wordH) + " " + t2h(verb.wordH) + "\n")
 
-def addThe(word):
-    result = "H|a " + word.wordH
+def addThe(heb):
+    result = "H|a " + heb
     return result
 
 def main():

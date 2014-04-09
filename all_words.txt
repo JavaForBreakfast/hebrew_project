@@ -1,5 +1,5 @@
-BANANA:B|a N|ah N|a H|:MS:N
-APPLE:B|a B|ah B|a:MS:N
-APPLES:H|a H|a:MP:N
-TALK:H|a N|a:MS:V
-TALK:H|a N|a N|:FS:V
+BALL:C|a D| Va|oo R|:MS:N
+RED:A|ah D| Va|oh M|:MS:A
+EATS:A| Va|oh Cha|e L|:MS:V
+APPLE:T|a P| Va|oo Ch|a:MS:N
+EATS:A| Va|oh Cha|e L|e T|:FS:V
